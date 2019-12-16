@@ -6,6 +6,7 @@ from flask import request
 from flask import render_template
 
 from model.post import Post
+from model.comment import Comment
 from errors import register_error_handlers
 
 
@@ -36,6 +37,9 @@ def list_posts():
 def get_post(post_id):
     return json.dumps(Post.find(post_id).to_dict())
 
+@app.route("/api/posts/<post_id>/comments", methods = ["GET"])
+def get_comments_for_post(post_id):
+    return json.dumps([comment.to_dict() for comment in Comment.find_by_post(post_id)])
 
 @app.route("/api/posts/<post_id>", methods = ["DELETE"])
 def delete_post(post_id):
@@ -57,6 +61,16 @@ def update_post(post_id):
     return json.dumps(post.save().to_dict())
 
 
+@app.route("/api/comments", methods = ["POST"])
+def create_comment():
+    comment_data = request.get_json(force=True, silent=True)
+    if comment_data == None:
+        return "Bad request", 400
+    comment = Comment(comment_data["content"], comment_data["post_id"])
+    comment.save()
+    return json.dumps(comment.to_dict()), 201
+
+
 @app.route("/", methods = ["GET"])
 def posts():
     return render_template("index.html")
@@ -67,3 +81,5 @@ def view_post(post_id):
     return render_template("post.html", post=Post.find(post_id))
 
 
+if __name__ == '__main__':
+    app.run()

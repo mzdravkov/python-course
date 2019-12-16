@@ -13,6 +13,16 @@ CREATE TABLE IF NOT EXISTS post
         content TEXT
     )
 ''')
+
+conn.cursor().execute('''
+CREATE TABLE IF NOT EXISTS comment
+    (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT,
+        post_id INTEGER,
+        FOREIGN KEY(post_id) REFERENCES post(id)
+    )
+''')
 conn.commit()
 
 
