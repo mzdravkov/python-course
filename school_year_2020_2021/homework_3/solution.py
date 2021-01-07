@@ -1,35 +1,20 @@
-from time import sleep
+def neighbours_alive_count(grid, row, col):
+    """ Takes a grid and a position and returns
+    the number of living neighbour cells."""
+    rows = range(max(0, row - 1), min(len(grid) - 1, row + 1) + 1)
+    cols = range(max(0, col - 1), min(len(grid[0]) - 1, col + 1) + 1)
+    return len([1 for x in cols for y in rows
+        if grid[y][x] == 1 and (x, y) != (col, row)])
+
+def next_cell_state(grid, row, col):
+    cell = grid[row][col]
+    living_neighbours = neighbours_alive_count(grid, row, col)
+    if cell == 1 and living_neighbours in {2, 3}:
+        return 1
+    elif cell == 0 and living_neighbours == 3:
+        return 1
+    return 0
 
 def next_generation(grid):
-    # Your implementation goes here
-    # Please don't upload the whole content of the file,
-    # but only this function (along with any additional
-    # code that your implementation requires)
-    pass
-
-
-def print_grid(grid):
-    for row in grid:
-        for cell in row:
-            print('■' if cell else '□', end=' ')
-        print('')
-
-
-def animate(grid):
-    generation = grid
-    while True:
-        print('')
-        print('')
-        print_grid(generation)
-        sleep(1)
-        generation = next_generation(generation)
-
-
-g = [[0 for i in range(15)] for k in range(15)]
-g[2][1] = 1
-g[2][2] = 1
-g[2][3] = 1
-g[1][3] = 1
-g[0][2] = 1
-
-animate(g)
+    return [[next_cell_state(grid, row, col) for col in range(len(grid[0]))]
+            for row in range(len(grid))]
